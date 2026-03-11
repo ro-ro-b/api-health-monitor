@@ -1,21 +1,6 @@
 import { EndpointTable } from '@/components/endpoint-table';
 import { SummaryCards } from '@/components/summary-cards';
-import type { HealthApiResponse } from '@/types/monitor';
-
-async function getHealthData(): Promise<HealthApiResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const endpoint = baseUrl ? `${baseUrl}/api/health` : 'http://localhost:3000/api/health';
-
-  const response = await fetch(endpoint, {
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch health data: ${response.status}`);
-  }
-
-  return response.json();
-}
+import { getHealthData } from '@/lib/health';
 
 export default async function HomePage() {
   const data = await getHealthData();

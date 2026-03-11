@@ -1,16 +1,22 @@
 import { NextResponse } from 'next/server';
 
-import { monitors } from '@/config/monitors';
-import { calculateDashboardSummary } from '@/lib/dashboard-summary';
-import { runHealthChecks } from '@/lib/health-check';
+import { getHealthData } from '@/lib/health';
 import type { HealthApiResponse } from '@/types/monitor';
 
-export async function GET(): Promise<NextResponse<HealthApiResponse>> {
-  const results = await runHealthChecks(monitors);
-  const summary = calculateDashboardSummary(results);
+export async function GET(): Promise<NextResponse<HealthApiResponse | { error: string }>> {
+  try {
+    const data = await getHealthData();
+    return NextResponse.json(data);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to retrieve health data';
 
-  return NextResponse.json({
-    summary,
-    results,
-  });
+    return NextResponse.json(
+      {
+        error: message,
+      },
+      {
+        status: 500,
+      },
+    );
+  }
 }
